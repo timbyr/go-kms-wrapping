@@ -73,11 +73,21 @@ func testDerivation(t *testing.T, root *Wrapper, encBlob *wrapping.BlobInfo) {
 	ctx := context.Background()
 	require := require.New(t)
 
+	rootKey := make([]byte, 32)
+	n, err := rand.Read(rootKey)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n != 32 {
+		t.Fatal(n)
+	}
+
 	sub, err := root.NewDerivedWrapper(
 		wrapping.WithKeyId("sub"),
 		wrapping.WithConfigMap(map[string]string{
 			"salt": base64.StdEncoding.EncodeToString([]byte("zip")),
 			"info": base64.StdEncoding.EncodeToString([]byte("zap")),
+			"key":  base64.StdEncoding.EncodeToString(rootKey),
 		}),
 	)
 	require.NoError(err)
